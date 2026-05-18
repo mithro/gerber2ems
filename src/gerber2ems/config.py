@@ -34,6 +34,12 @@ class PortConfig:
     plane: int = field(default=1)
     dB_margin: float = field(default=-15)  # noqa: N815
     excite: bool = field(default=False)
+    # When true the port is added as a lumped (resistive) port via
+    # AddLumpedPort instead of a microstrip-line port (AddMSLPort).
+    # Required for feeds that have no microstrip reference plane —
+    # e.g. an antenna feed gap (NFC/Qi coil, BLE IFA). Default false
+    # preserves the existing MSL behaviour.
+    lumped: bool = field(default=False)
 
     @staticmethod
     def with_name(p: str) -> PortConfig:

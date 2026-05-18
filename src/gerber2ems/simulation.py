@@ -494,7 +494,10 @@ class Simulation:
         self.ports = []
 
         for index, port_config in enumerate(cfg.ports):
-            self.add_msl_port(port_config, index, True)
+            if port_config.lumped:
+                self.add_resistive_port(port_config, True)
+            else:
+                self.add_msl_port(port_config, index, True)
 
     def add_virtual_ports(self) -> None:
         """Add virtual ports needed for data postprocessing due to openEMS api design."""
