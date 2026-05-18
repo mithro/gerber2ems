@@ -284,17 +284,32 @@ class Simulation:
             self.grid.AddLine("y", i)
         self.grid.AddLine("z", 0)
         self.grid.AddLine("z", 10)
-        port = self.fdtd.AddMSLPort(
-            len(self.ports),
-            self.csx.AddMetal(f"VirtualPort_{len(self.ports)}"),
-            [0, 0, 0],
-            [10, 10, 10],
-            "x",
-            "z",
-            Feed_R=port_config.impedance,
-            priority=100,
-            excite=0,
-        )
+        if port_config.lumped:
+            # Must match the real port type so CalcPort reads the
+            # lumped-style port_ut_<n>/port_it_<n> files (a lumped
+            # port has a single U/I probe; an MSL port writes the
+            # de-embedding A/B/C-suffixed files instead).
+            port = self.fdtd.AddLumpedPort(
+                len(self.ports),
+                port_config.impedance,
+                [0, 0, 0],
+                [10, 10, 10],
+                "z",
+                excite=0,
+                priority=100,
+            )
+        else:
+            port = self.fdtd.AddMSLPort(
+                len(self.ports),
+                self.csx.AddMetal(f"VirtualPort_{len(self.ports)}"),
+                [0, 0, 0],
+                [10, 10, 10],
+                "x",
+                "z",
+                Feed_R=port_config.impedance,
+                priority=100,
+                excite=0,
+            )
         self.ports.append(port)
 
     def add_plane(self, z_height: float) -> None:
